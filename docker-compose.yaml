@@ -5,6 +5,7 @@ services:
     image: mysql:latest
     restart: always
     environment:
+      DB_HOST: "localhost"
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
@@ -13,7 +14,28 @@ services:
       - '${MYSQL_PORT}:3306'
     volumes:
       - mysql:/var/lib/mysql
+    networks:
+      - fourrum
+
+  backend:
+    build:
+      context: "./backend"
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - '${BACKEND_PORT}:8080'
+    volumes:
+      - ./backend:/home/appuser
+    networks:
+      - fourrum
+
 
 volumes:
   mysql:
     driver: local
+    
+networks:
+  fourrum: {}
