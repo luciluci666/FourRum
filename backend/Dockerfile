@@ -33,6 +33,6 @@ USER appuser
 # Install application into container
 COPY . .
 
-# Run the application
-ENTRYPOINT ["python", "-m", "http.server"]
-CMD ["--directory", "directory", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+
+
