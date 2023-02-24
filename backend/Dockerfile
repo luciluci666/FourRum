@@ -30,7 +30,6 @@ RUN useradd --create-home appuser
 WORKDIR /home/appuser
 USER appuser
 
-# Install application into container
 COPY . .
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
