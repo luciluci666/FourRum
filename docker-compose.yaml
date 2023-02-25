@@ -27,10 +27,11 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_KEY: ${JWT_KEY}
     ports:
-      - '${BACKEND_PORT}:8080'
+      - '${BACKEND_PORT}:8000'
     volumes:
-      - ./backend:/home/appuser
+      - ./backend:/opt
     networks:
       - fourrum
 
