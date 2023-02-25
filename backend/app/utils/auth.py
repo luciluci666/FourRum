@@ -4,7 +4,7 @@ from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 from config import JWT_KEY, JWT_ENCODING, MAIN_DB_URL
 
@@ -21,7 +21,7 @@ def get_password_hash(password):
 
 def get_user(engine, username: str):
     with engine.connect() as db_conn:
-        user_tuple = db_conn.execute(f'SELECT * FROM Users WHERE username = "{username}"').fetchone()
+        user_tuple = db_conn.execute(text(f"SELECT * FROM Users WHERE username='{username}'")).fetchone()
         if user_tuple:
             return User(**user_tuple)
 

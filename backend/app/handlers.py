@@ -6,11 +6,12 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app.serializers import Token, User
 from config import MAIN_DB_URL, ACCESS_TOKEN_EXPIRE_MINUTES
-from utils import authenticate_user, create_access_token, get_current_active_user
+from .utils import authenticate_user, create_access_token, get_current_active_user
 
 
 engine = create_engine(MAIN_DB_URL, echo=True)
-router = APIRouter
+router = APIRouter()
+
 
 @router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -29,3 +30,8 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 @router.get("/users/me/", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
     return current_user
+
+
+@router.get("/")
+async def check_connection():
+    return {"message": "Connection OK", "status": 200}
