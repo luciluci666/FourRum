@@ -41,7 +41,7 @@ services:
       context: "./frontend"
     restart: always
     ports:
-      - '${FRONTEND_PORT}:3000'
+      - '19006:19006'
     volumes:
       - ./frontend:/var/www/html
     networks:
