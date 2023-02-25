@@ -7,6 +7,9 @@ name = "pypi"
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 sqlalchemy = "*"
+python-jose = {extras = ["cryptography"], version = "*"}
+passlib = {extras = ["bcrypt"], version = "*"}
+python-multipart = "*"
 
 [dev-packages]
 
