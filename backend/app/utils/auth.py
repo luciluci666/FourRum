@@ -1,73 +1,98 @@
-from datetime import datetime, timedelta
-from typing import Union
 from jose import JWTError, jwt
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import HTTPException, status
 from passlib.context import CryptContext
-from sqlalchemy import create_engine, text
+from datetime import datetime, timedelta
+from re import fullmatch
 
-from config import JWT_KEY, JWT_ENCODING, MAIN_DB_URL
+from config import JWT_KEY, JWT_ENCODING, JWT_EXPIRE_MINUTES
+from app.schemas import RegUser
+from app.database import User
 
-from app.serializers import User, TokenData
 
-engine = create_engine(MAIN_DB_URL, echo=True)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+email_scheme = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
 
+class AuthException(Exception):
 
+    def __init__(self):
+        self.exception = HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Registration or Authorization Error"
+        )
+
+        
+# registration
+def check_reg_data_correct(session, data: RegUser):
+    exception = AuthException().exception
+    if (not data.username) or (not data.email) or (not data.password):
+        exception.detail = "Username, email, and password can't be empty"
+        raise exception
+    else:
+        duplicate_username = get_user(session, data.username)
+        duplicate_email = session.query(User).filter(User.email == data.email).first()
+        if duplicate_username:
+            exception.detail = "There alredy is an account with such username"
+            raise exception
+        elif duplicate_email:
+            exception.detail = "There alredy is an account with such email"
+            raise exception
+        elif not fullmatch(email_scheme, data.email):
+            exception.detail = "Email spelling is incorrect"
+            raise exception
+        elif len(data.password) < 8:
+            exception.detail = "Password is too small, it should have at least 8 symbols"
+            raise exception
+        else:
+            return data
+
+def verify_email(email):
+    return True
+            
 def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def get_user(engine, username: str):
-    with engine.connect() as db_conn:
-        user_tuple = db_conn.execute(text(f"SELECT * FROM Users WHERE username='{username}'")).fetchone()
-        if user_tuple:
-            return User(**user_tuple)
+# authorization
+def get_user(session, username: str):
+    user = session.query(User).filter(User.username == username).first()
+    if user:
+        return user
 
+def authenticate_user(session, username: str, password: str):
+    exception = AuthException().exception
+    exception.detail="Incorrect username or password"
 
-def authenticate_user(engine, username: str, password: str):
-    user = get_user(engine, username)
-    print(user)
+    user = get_user(session, username)
     if not user:
-        return False
+        raise exception
     if not pwd_context.verify(password, user.hashed_password):
-        return False
+        raise exception
     return user
 
-
-def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, JWT_KEY, algorithm=JWT_ENCODING)
+def create_access_token(user: User):
+    payload = {
+        'username': user.username,
+        'email': user.email,
+        'exp': datetime.utcnow() + timedelta(minutes=JWT_EXPIRE_MINUTES),
+        'iat': datetime.utcnow(),
+        'iss': 'FourRoom',
+    }
+    encoded_jwt = jwt.encode(payload, JWT_KEY, algorithm=JWT_ENCODING)
     return encoded_jwt
 
-
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+def get_user_by_jwt(session, token: str):
+    exception = AuthException().exception
+    exception.detail="Could not validate credentials"
     try:
-        payload = jwt.decode(token, JWT_KEY, algorithms=[JWT_ENCODING])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-        token_data = TokenData(username=username)
+        payload = jwt.decode(token, JWT_KEY, algorithm=JWT_ENCODING)
+        if payload.get("exp") < datetime.utcnow():
+            exception.detail="JWT expired"
+            raise exception
+        else:
+            jwt_username = payload.get("username")
     except JWTError:
-        raise credentials_exception
-    user = get_user(engine, username=token_data.username)
+        raise exception
+    user = get_user(session, username=jwt_username)
     if user is None:
-        raise credentials_exception
+        raise exception
     return user
-
-
-async def get_current_active_user(current_user: User = Depends(get_current_user)):
-    if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user

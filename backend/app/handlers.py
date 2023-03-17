@@ -1,37 +1,61 @@
-from datetime import timedelta
-from sqlalchemy import create_engine
-from fastapi import Depends, HTTPException, status, APIRouter
-from fastapi.security import OAuth2PasswordRequestForm
+from datetime import datetime
+from sqlalchemy.orm import sessionmaker
+from fastapi import APIRouter, Request
+
+from app.schemas import Token, RegUser, LogInUser, BasicResponse, RegResponse, UserJson
+from app.database import User
+from .utils import authenticate_user, create_access_token, get_password_hash, check_reg_data_correct, verify_email, get_user_by_jwt
 
 
-from app.serializers import Token, User
-from config import MAIN_DB_URL, ACCESS_TOKEN_EXPIRE_MINUTES
-from .utils import authenticate_user, create_access_token, get_current_active_user
+class Handlers:
+
+    def __init__(self, engine):
+        self.router = APIRouter()
+        self.engine = engine
+        Session = sessionmaker(self.engine)
+        self.session = Session()
+
+        self.router.add_api_route("/user/reg/", self.registration, methods=["POST"], response_model=RegResponse)
+        self.router.add_api_route("/user/login/", self.log_in_for_access_token, methods=["POST"], response_model=Token)
+        self.router.add_api_route("/users", self.get_all_users, methods=["GET"])
+        self.router.add_api_route("/", self.check_connection, methods=["GET"], response_model=BasicResponse)
+
+        # online routes
+        self.router.add_api_route("/user/delete/", self.delete_account, methods=["POST"], response_model=BasicResponse)
 
 
-engine = create_engine(MAIN_DB_URL, echo=True)
-router = APIRouter()
+    async def registration(self, data: RegUser, request: Request):
+        if check_reg_data_correct(self.session, data):
+            if verify_email(data.email):
+                hashed_password = get_password_hash(data.password)
+                self.session.add(User(data.username, data.email, hashed_password, online=False, reg_date=datetime.utcnow().date(), locale=data.locale, ip=request.client.host))
+                self.session.commit()
+                return {"detail": "Successefuly registered new account", 'reg_data': data}
 
-
-@router.post("/token", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = authenticate_user(engine, str(form_data.username), str(form_data.password))
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
-    return {"access_token": access_token, "token_type": "bearer"}
-
-
-@router.get("/users/me/", response_model=User)
-async def read_users_me(current_user: User = Depends(get_current_active_user)):
-    return current_user
-
-
-@router.get("/")
-async def check_connection():
-    return {"message": "Connection OK", "status": 200}
+    async def log_in_for_access_token(self, data: LogInUser, request: Request):
+        user = authenticate_user(self.session, str(data.username), str(data.password))
+        if user.jwt is None:
+            access_token = create_access_token(user)
+            user.jwt = access_token
+        user.last_active_datetime = datetime.now()
+        user.ip = request.client.host
+        self.session.commit()
+        return {"access_token": user.jwt, "token_type": "bearer"}
+        
+    async def get_all_users(self):
+        my_json = {}
+        users = self.session.query(User).all()
+        for user in users:
+            dict = user.__dict__
+            del dict['_sa_instance_state']
+            my_json[f"{user.id}. {user.username}"] = dict
+        return my_json
+    
+    async def check_connection(self):
+        return {"detail": "Connection OK", "status": 200}
+    
+    # online requests
+    async def delete_account(self, data: Token):
+        self.session.query(User).filter(User.jwt == data.access_token).delete()
+        self.session.commit()
+        return {"detail": "Account successefuly deleted", "status": 200}
