@@ -84,12 +84,17 @@ const RegistrationScreen = props => {
   };
 
   const registration = async () => {
-    let languages = getLocales();
+    let langCode = "en";
+    try {
+      langCode = getLocales()[0].languageCode;
+    } catch (error) {
+      console.warn(error);
+    } 
     let body = {
       "username": username,
       "email": email,
       "password": password,
-      "locale": languages[0].languageCode,
+      "locale": langCode,
     };
     console.log(body);
 
