@@ -1,9 +1,18 @@
 FROM node:16-alpine
-ENV NODE_ENV=development
 
-WORKDIR /var/www/html
-COPY .. .
+ARG NODE_ENV=development
+ENV NODE_ENV $NODE_ENV
 
-RUN npm i -g expo-cli@latest
+
+ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
+ENV PATH /home/node/.npm-global/bin:$PATH
+RUN npm i --unsafe-perm --allow-root -g npm@latest expo-cli@latest
+
+ENV PATH /opt/.bin:$PATH
+
+WORKDIR /opt/app
+COPY . .
+
 RUN npm install
+
 CMD npm run web
