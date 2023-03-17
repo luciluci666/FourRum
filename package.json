@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@jest/globals": "^29.5.0",
+    "expo-splash-screen": "^0.18.1"
+  }
+}
