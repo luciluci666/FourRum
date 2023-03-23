@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, SafeAreaView, Keyboard, Button } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import CustomInput from '../components/CustomInput'
 import url from '../Globals'
 
 const LoginScreen = props => {
-  const [username, setUsername] = useState('StolenAmigo')
-  const [password, setPassword] = useState('gerllen05')
+  const [username, setUsername] = useState('StolenAmigo');
+  const [password, setPassword] = useState('gerllen05');
 
   const [errors, setErrors] = useState({})
   const handleError = (error, input) => {
@@ -45,11 +46,11 @@ const LoginScreen = props => {
 
     if (isValid) {
       console.log('Trying to log in...');
-      registration();
+      login();
     }
   };
 
-  const registration = async () => {
+  const login = async () => {
     let body = {
       "username": username,
       "password": password,
@@ -63,15 +64,25 @@ const LoginScreen = props => {
       },
       body: JSON.stringify(body),
       });
-    response.json().then(data => {
+    response.json().then(async (data) => {
         if (!response.ok) {
           console.log(data.detail);
         } else {
-          console.log(data)
-          props.navigation.navigate('Log in')
+          console.log(data);
+          const jwt = data.access_token;
+          await storeUserData(jwt);
+          props.navigation.navigate('Home');
         }
       });
   };
+
+  const storeUserData = async (value) => {
+    try {
+      await AsyncStorage.setItem('FourRoomUserData', value)
+    } catch (e) {
+      console.warn(e)
+    }
+  }
 
   return (
     <SafeAreaView style={styles.container}>

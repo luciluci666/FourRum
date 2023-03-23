@@ -37,19 +37,19 @@ services:
     networks:
       - fourrum
 
-  frontend:
-    container_name: frontend
-    build:
-      context: "./frontend"
-    restart: always
-    ports:
-      - '19006:19006'
-      - '19001:19001'
-      - '19002:19002'
-    volumes:
-      - ./frontend:/var/www/html
-    networks:
-      - fourrum
+  # frontend:
+  #   container_name: frontend
+  #   build:
+  #     context: "./frontend"
+  #   restart: always
+  #   ports:
+  #     - '19006:19006'
+  #     - '19001:19001'
+  #     - '19002:19002'
+  #   volumes:
+  #     - ./frontend:/var/www/html
+  #   networks:
+  #     - fourrum
 
 
 volumes:
