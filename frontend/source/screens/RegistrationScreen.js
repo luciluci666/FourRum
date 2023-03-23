@@ -6,10 +6,10 @@ import CustomInput from '../components/CustomInput'
 import url from '../Globals'
 
 const RegistrationScreen = props => {
-  const [username, setUsername] = useState('StolenAmigo')
-  const [email, setEmail] = useState('gerllen05@gmail.com')
-  const [password, setPassword] = useState('gerllen05')
-  const [confirmPassword, setConfirmPassword] = useState('gerllen05')
+  const [username, setUsername] = useState('StolenAmigo');
+  const [email, setEmail] = useState('gerllen05@gmail.com');
+  const [password, setPassword] = useState('gerllen05');
+  const [confirmPassword, setConfirmPassword] = useState('gerllen05');
 
   const [errors, setErrors] = useState({})
   const handleError = (error, input) => {

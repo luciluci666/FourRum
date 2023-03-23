@@ -9,6 +9,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import RegistrationScreen from './source/screens/RegistrationScreen'
 import SplashScreen from './source/screens/SplashScreen';
 import LoginScreen from './source/screens/LoginScreen';
+import HomeScreen from './source/screens/HomeScreen';
 
 // SplashScreen.preventAutoHideAsync();
 const Stack = createStackNavigator();
@@ -51,6 +52,13 @@ export default function App() {
         <Stack.Screen 
           name="Log in"
           component={LoginScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen 
+          name="Home"
+          component={HomeScreen}
           options={{
             headerShown: false,
           }}

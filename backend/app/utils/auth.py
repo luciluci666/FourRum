@@ -1,4 +1,4 @@
-from jose import JWTError, jwt
+import jwt
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
@@ -42,6 +42,9 @@ def check_reg_data_correct(session, data: RegUser):
         elif len(data.password) < 8:
             exception.detail = "Password is too small, it should have at least 8 symbols"
             raise exception
+        elif len(data.locale) > 2:
+            exception.detail = "Incorrect locale parameter"
+            raise exception
         else:
             return data
 
@@ -65,7 +68,7 @@ def authenticate_user(session, username: str, password: str):
     user = get_user(session, username)
     if not user:
         raise exception
-    if not pwd_context.verify(password, user.hashed_password):
+    if not pwd_context.verify(password, user.hashedPassword):
         raise exception
     return user
 
@@ -84,13 +87,13 @@ def get_user_by_jwt(session, token: str):
     exception = AuthException().exception
     exception.detail="Could not validate credentials"
     try:
-        payload = jwt.decode(token, JWT_KEY, algorithm=JWT_ENCODING)
-        if payload.get("exp") < datetime.utcnow():
-            exception.detail="JWT expired"
-            raise exception
-        else:
-            jwt_username = payload.get("username")
-    except JWTError:
+        payload = jwt.decode(token, JWT_KEY, algorithms=JWT_ENCODING)
+        jwt_username = payload.get("username")
+    except jwt.ExpiredSignatureError:
+        exception.detail = "Access token expired"
+        raise exception
+    except (jwt.InvalidTokenError, jwt.InvalidSignatureError):
+        exception.detail = "Invalid access token"
         raise exception
     user = get_user(session, username=jwt_username)
     if user is None:

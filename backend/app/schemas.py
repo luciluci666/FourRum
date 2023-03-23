@@ -1,7 +1,21 @@
 from pydantic import BaseModel
-from typing import Union
-from datetime import date, time
+from typing import Union, List
+from datetime import datetime
 
+class UserModel(BaseModel):
+    id: int
+    username: str
+    email: str
+    hashedPassword: str
+    online: bool
+    regAt: datetime 
+    ip: str
+    locale: str
+    lastActiveAt: Union[datetime, None] = None
+    jwt: Union[str, None] = None
+
+class UsersResponse(BaseModel):
+    users: List[UserModel]
 
 class Token(BaseModel):
     access_token: str
@@ -25,13 +39,14 @@ class RegResponse(BaseModel):
     detail: str
     reg_data: RegUser
 
-class UserJson(BaseModel):
+class Room(BaseModel):
     id: int
-    username: str
-    email: str
-    hashed_password: str
-    online: bool
-    reg_date: Union[date, None] = None
-    last_log_in_date: Union[time, None] = None
-    last_log_in_time: Union[time, None] = None
-    jwt: Union[str, None] = None
+    title: str
+    description: str  
+    type: str 
+    colour: str  
+    creatorId: int  
+    createdAt: datetime  
+
+class RoomResponse(BaseModel):
+    rooms: List[Room]
