@@ -5,48 +5,49 @@ from datetime import datetime, timedelta
 from re import fullmatch
 
 from config import JWT_KEY, JWT_ENCODING, JWT_EXPIRE_MINUTES
-from app.schemas import RegUser
+from app.schemas import RegForm
 from app.database import User
+from app.utils.exceptions import AuthException, ValidationException
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 email_scheme = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
 
-class AuthException(Exception):
-
-    def __init__(self):
-        self.exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Registration or Authorization Error"
+def get_user_by_username(session, username: str):
+    user = session.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="The account you are trying to access can not be found"
         )
-
+    elif user.isDeleted:
+        raise HTTPException(
+        status_code=status.HTTP_410_GONE,
+        detail="The account you are trying to access was deleted"
+        )
+    else:
+        return user
         
 # registration
-def check_reg_data_correct(session, data: RegUser):
-    exception = AuthException().exception
+def check_reg_data_correct(session, data: RegForm):
     if (not data.username) or (not data.email) or (not data.password):
-        exception.detail = "Username, email, and password can't be empty"
-        raise exception
+        raise ValidationException("Username, email, and password can't be empty").exception
     else:
-        duplicate_username = get_user(session, data.username)
+        duplicate_username = session.query(User).filter(User.username == data.username).first()
         duplicate_email = session.query(User).filter(User.email == data.email).first()
         if duplicate_username:
-            exception.detail = "There alredy is an account with such username"
-            raise exception
+            if not duplicate_username.isDeleted:
+                raise ValidationException("There already is an account with such username").exception
         elif duplicate_email:
-            exception.detail = "There alredy is an account with such email"
-            raise exception
+            if not duplicate_email.isDeleted:
+                raise ValidationException("There already is an account with such email").exception
         elif not fullmatch(email_scheme, data.email):
-            exception.detail = "Email spelling is incorrect"
-            raise exception
+            raise ValidationException("Email spelling is incorrect").exception
         elif len(data.password) < 8:
-            exception.detail = "Password is too small, it should have at least 8 symbols"
-            raise exception
+            raise ValidationException("Password is too small, it should have at least 8 symbols").exception
         elif len(data.locale) > 2:
-            exception.detail = "Incorrect locale parameter"
-            raise exception
-        else:
-            return data
+            raise ValidationException("Incorrect locale parameter").exception
+        return data
 
 def verify_email(email):
     return True
@@ -56,20 +57,10 @@ def get_password_hash(password):
 
 
 # authorization
-def get_user(session, username: str):
-    user = session.query(User).filter(User.username == username).first()
-    if user:
-        return user
-
 def authenticate_user(session, username: str, password: str):
-    exception = AuthException().exception
-    exception.detail="Incorrect username or password"
-
-    user = get_user(session, username)
-    if not user:
-        raise exception
+    user = get_user_by_username(session, username)
     if not pwd_context.verify(password, user.hashedPassword):
-        raise exception
+        raise AuthException("Incorrect username or password").exception
     return user
 
 def create_access_token(user: User):
@@ -84,18 +75,16 @@ def create_access_token(user: User):
     return encoded_jwt
 
 def get_user_by_jwt(session, token: str):
-    exception = AuthException().exception
-    exception.detail="Could not validate credentials"
     try:
         payload = jwt.decode(token, JWT_KEY, algorithms=JWT_ENCODING)
         jwt_username = payload.get("username")
     except jwt.ExpiredSignatureError:
-        exception.detail = "Access token expired"
-        raise exception
+        raise AuthException("Access token expired").exception
     except (jwt.InvalidTokenError, jwt.InvalidSignatureError):
-        exception.detail = "Invalid access token"
-        raise exception
-    user = get_user(session, username=jwt_username)
-    if user is None:
-        raise exception
+        raise AuthException("Invalid access token").exception
+    except:
+        raise AuthException("Cpuld not validate credentials").exception
+    user = get_user_by_username(session, username=jwt_username)
+    user.lastActiveAt = datetime.utcnow()
+    session.commit()
     return user
