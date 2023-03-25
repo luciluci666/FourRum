@@ -7,14 +7,13 @@ name = "pypi"
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 sqlalchemy = "*"
-PyJWT = "*"
-python-jose = {extras = ["cryptography"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}
 python-multipart = "*"
 setuptools = "*"
 mysqlclient = "*"
+pyjwt = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.8"
+python_version = "*"

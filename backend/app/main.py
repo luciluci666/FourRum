@@ -9,9 +9,11 @@ from app.database import Database
 
 
 sleep(2)
-engine = create_engine(MAIN_DB_URL, echo=True)
+DEBUG = True
+ENGINE = create_engine(MAIN_DB_URL, echo=DEBUG)
+
 try:
-    Database(engine).create_tables()
+    Database(ENGINE).create_tables()
 except Exception as e:
     print(e)
 
@@ -23,7 +25,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(router=Handlers(engine).router)
+app.include_router(router=Handlers(ENGINE, DEBUG).router)
 
 # if __name__ == "__main__":
 #     main()
