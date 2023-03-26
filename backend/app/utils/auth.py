@@ -7,7 +7,7 @@ from re import fullmatch
 from config import JWT_KEY, JWT_ENCODING, JWT_EXPIRE_MINUTES
 from app.schemas import RegForm
 from app.database import User
-from app.utils.exceptions import AuthException, ValidationException
+from app.utils.exceptions import AuthException, NotFoundException, GoneException, ValidationException
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -16,15 +16,9 @@ email_scheme = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
 def get_user_by_username(session, username: str):
     user = session.query(User).filter(User.username == username).first()
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="The account you are trying to access can not be found"
-        )
+        raise NotFoundException("The account you are trying to access can not be found").exception
     elif user.isDeleted:
-        raise HTTPException(
-        status_code=status.HTTP_410_GONE,
-        detail="The account you are trying to access was deleted"
-        )
+        raise GoneException("The account you are trying to access was deleted").exception
     else:
         return user
         
