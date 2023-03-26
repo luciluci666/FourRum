@@ -22,7 +22,7 @@ class RoomModel(BaseModel):
     title: str
     description: str  
     type: str 
-    access: str
+    isPrivate: bool
     colour: str
     creatorId: int  
     createdAt: datetime
@@ -54,14 +54,14 @@ class CreateRoomForm(BaseModel):
     title: str
     description: str
     type: str
-    access: str
+    isPrivate: bool
     colour: str
 
 class EditRoomForm(BaseModel):
     roomId: int
     title: str
     description: str
-    access: str
+    isPrivate: bool
     colour: str
 
 class IdRoomForm(BaseModel):
@@ -85,3 +85,6 @@ class UsersResponse(BaseModel):
 
 class RoomsResponse(BaseModel):
     rooms: List[RoomModel]
+
+class User__RoomsResponse(BaseModel):
+    user_room_relationships: List[User__RoomModel]

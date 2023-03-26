@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Date, Time, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 
 BASE = declarative_base()
 
@@ -63,22 +63,22 @@ class Room(BASE):
     title = Column("title", String(32), nullable=False)
     description = Column("description", String(128), nullable=False)
     type = Column("type", String(16), nullable=False)
-    access = Column("access", String(8), nullable=False)
     colour = Column("colour", String(8), nullable=False)
     creatorId = Column("creatorId", Integer, ForeignKey("Users.id", ondelete="CASCADE"), nullable=False)
+    isPrivate = Column("isPrivate", Boolean, nullable=False)
     createdAt = Column("createdAt", DateTime, nullable=False)
     isClosed = Column("isClosed", Boolean, nullable=True)
     isDeleted = Column("isDeleted", Boolean, nullable=False)
     deletedAt = Column("deletedAt", DateTime)
 
-    def __init__(self, title, description, type, access, colour, creatorId, createdAt, isClosed=False, isDeleted=False, deletedAt=None):
+    def __init__(self, title, description, type, colour, creatorId, createdAt, isPrivate=False, isClosed=False, isDeleted=False, deletedAt=None):
         self.title = title
         self.description = description
         self.type = type # group, channel, thread, discussion
-        self.access = access # private, public, change to is public
         self.colour = colour # hex rgb
         self.creatorId = creatorId
         self.createdAt = createdAt
+        self.isPrivate = isPrivate
         self.isClosed = isClosed # for threads and duscussions
         self.isDeleted = isDeleted
         self.deletedAt = deletedAt
@@ -87,7 +87,7 @@ class Room(BASE):
         return f"""{self.id}. title: {self.title} 
             description: {self.description}
             type: {self.type}
-            access: {self.access}
+            isPrivate: {self.isPrivate}
             colour: {self.colour} 
             creatorId: {self.creatorId} 
             createdAt: {self.createdAt}
