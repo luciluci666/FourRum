@@ -64,7 +64,7 @@ def get_user_room_relationship(session, user_id, room_id, should_have_admin_righ
             raise ForbiddenException("You don't have admin rights in this room").exception
     return user_room_relationship
     
-def check_user_room_relationship(session, user_id, room_id):
+def check_user_can_enter_room(session, user_id, room_id):
     user_room_relationship = session.query(User__Room).filter(User__Room.userId == user_id).filter(User__Room.roomId == room_id).order_by(User__Room.id.desc()).first()
     if user_room_relationship:
         if not user_room_relationship.isDeleted:

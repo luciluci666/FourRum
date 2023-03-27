@@ -1,4 +1,10 @@
+from sqlalchemy.orm import sessionmaker
 from datetime import datetime
+
+def get_session(engine):
+    Session = sessionmaker(engine)
+    session = Session()
+    return session
 
 def object_to_json(object):
     dict = object.__dict__
