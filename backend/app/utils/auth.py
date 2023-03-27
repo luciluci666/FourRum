@@ -41,10 +41,9 @@ def check_reg_data_correct(session, data: RegForm):
             raise ValidationException("Password is too small, it should have at least 8 symbols").exception
         elif len(data.locale) > 2:
             raise ValidationException("Incorrect locale parameter").exception
-        return data
 
 def verify_email(email):
-    return True
+    pass
             
 def get_password_hash(password):
     return pwd_context.hash(password)

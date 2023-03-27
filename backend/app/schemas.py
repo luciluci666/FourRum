@@ -88,3 +88,12 @@ class RoomsResponse(BaseModel):
 
 class User__RoomsResponse(BaseModel):
     user_room_relationships: List[User__RoomModel]
+
+class UserResponse(BaseModel):
+    user: UserModel
+
+class RoomResponse(BaseModel):
+    room: RoomModel
+
+class User__RoomResponse(BaseModel):
+    user_room_relationship: User__RoomModel
