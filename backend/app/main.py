@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from time import sleep
 
 from config import MAIN_DB_URL
-from app.handlers import Handlers
+from app.urls import router
 from app.database import Database
 
 sleep(2)
@@ -27,7 +27,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(router=Handlers(ENGINE, DEBUG).router)
+app.include_router(router=router)
 
 # if __name__ == "__main__":
 #     main()
