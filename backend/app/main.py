@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from time import sleep
 
 from config import MAIN_DB_URL
-from app.urls import router
+from app.routes import Routes
 from app.database import Database
 
 sleep(2)
@@ -14,7 +14,7 @@ DB_CONFIG = {
     'pool_timeout': 30,
     'pool_recycle': 3600,
     'max_overflow': 10,
-    'echo': DEBUG,
+    'echo': False,
 }
 
 ENGINE = Database(MAIN_DB_URL, DB_CONFIG).engine
@@ -27,7 +27,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(router=router)
+app.include_router(router=Routes(ENGINE, DEBUG).router)
 
 # if __name__ == "__main__":
 #     main()
