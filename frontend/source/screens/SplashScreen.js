@@ -2,12 +2,14 @@ import React, { useCallback } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { useFonts } from 'expo-font';
 
+import { white, light, dark, black, red } from '../Globals'
+
 const SplashScreen = props => {
   const [fontsLoaded] = useFonts({
-    // 'Montserrat-Light': require('../../assets/fonts/Montserrat-Light.ttf'),
-    // 'Montserrat-LightItalic': require('../../assets/fonts/Montserrat-LightItalic.ttf'),
-    // 'Montserrat-SemiBold': require('../../assets/fonts/Montserrat-SemiBold.ttf'),
-    // 'Montserrat-SemiBoldItalic': require('../../assets/fonts/Montserrat-SemiBoldItalic.ttf'),
+    'Montserrat-Light': require('../../assets/fonts/Montserrat-Light.ttf'),
+    'Montserrat-LightItalic': require('../../assets/fonts/Montserrat-LightItalic.ttf'),
+    'Montserrat-SemiBold': require('../../assets/fonts/Montserrat-SemiBold.ttf'),
+    'Montserrat-SemiBoldItalic': require('../../assets/fonts/Montserrat-SemiBoldItalic.ttf'),
   });
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
@@ -21,17 +23,17 @@ const SplashScreen = props => {
 
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
-      <Text style={styles.text}>
+      {/* <Text style={styles.text}>
         SplashScreen
-      </Text>
+      </Text> */}
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
-    
+    backgroundColor: dark,
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -6,7 +6,7 @@ from re import fullmatch
 
 from config import JWT_KEY, JWT_ENCODING, JWT_EXPIRE_MINUTES
 from app.schemas import RegForm
-from app.database import User
+from app.models import User
 from app.utils.exceptions import AuthException, NotFoundException, GoneException, ValidationException
 
 

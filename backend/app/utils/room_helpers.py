@@ -1,7 +1,7 @@
 from re import match
 from datetime import datetime
 
-from app.database import Room, User__Room
+from app.models import Room, User__Room
 from app.schemas import EditRoomForm
 from app.utils.exceptions import ForbiddenException, NotFoundException, ConflictException, GoneException, ValidationException
 from app.utils.general import object_to_json, delete_object

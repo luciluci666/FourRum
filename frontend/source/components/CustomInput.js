@@ -2,19 +2,19 @@ import React, {useState} from 'react';
 import { TextInput } from 'react-native';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { white, light, dark, black, red } from '../Globals'
+
 const CustomInput = ({ value, setValue = () => {}, placeholder, error, errorHandler = () => {}, validate = () => {}, secureTextEntry }) => {
   const [isFocused, setIsFocused] = React.useState(false);
 
   return (
     <View style={styles.container} >
       <View style={
-        {borderColor: error
-          ? 'red'
+        [{borderColor: error
+          ? red
           : isFocused
-          ? 'green'
-          : 'blue' ,
-        borderWidth: 1,
-        borderRadius: 5, } } >
+          ? white
+          : light , }, styles.box]} >
         <TextInput 
         style={styles.input} 
         value={value}
@@ -23,9 +23,9 @@ const CustomInput = ({ value, setValue = () => {}, placeholder, error, errorHand
         onBlur={() => {validate(), setIsFocused(false)}}
         placeholder={placeholder}
         autoCorrect={false}
-        secureTextEntry={secureTextEntry}  />
-        </View>
-
+        secureTextEntry={secureTextEntry} />
+      </View>
+      
       {error && (
       <Text style={styles.error}>
         {error}
@@ -36,22 +36,31 @@ const CustomInput = ({ value, setValue = () => {}, placeholder, error, errorHand
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
     width: '70%',
     maxWidth: 400,
+    height: "10%",
+    maxHeight: 50,
     marginVertical: 5,
     marginHorizontal: 5,
     borderRadius: 5,
   },
-  input: {
+  box: {
+    height: "80%",
     borderRadius: 5,
-    // fontFamily: 'Montserrat-SemiBold',
+    borderWidth: 2,
+    backgroundColor: dark,
+  },
+  input: {
+    width: '100%',
+    height: "100%",
+    marginHorizontal: 3,
+    outlineStyle: 'none',
+    color: white,
   },
   error: {
-    color: 'red', 
     fontSize: 12,
-    backgroundColor: '#94B5E1',
-    // fontFamily: 'Montserrat-SemiBold',
+    backgroundColor: dark,
+    color: red,
   }
 })
 

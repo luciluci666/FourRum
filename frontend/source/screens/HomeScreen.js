@@ -3,13 +3,21 @@ import { StyleSheet, SafeAreaView, Text, Keyboard, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import url from '../Globals'
+import { white, light, dark, black, red } from '../Globals'
 
 const HomeScreen = props => {
   const [accessToken, setAccessToken] = useState('');
+  const [userRooms, setUserRooms] = useState([]);
+
   useEffect(() => {
+    if (!accessToken) {
     getUserData();
+    }
+    else {
+    fetchUserRooms();
+    }
     return () => {};
-  }, []);
+  }, [accessToken]);
 
   const getUserData = async () => {
     try {
@@ -24,11 +32,11 @@ const HomeScreen = props => {
   };
 
   const fetchUserRooms = async () => {
-    const response = await fetch(url + '/user/login/', {
+    const response = await fetch(url + '/user/rooms/', {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'Authorization': `${accessToken}`
+        'token': `${accessToken}`
       },
     })
     response.json().then(async (data) => {
@@ -36,9 +44,7 @@ const HomeScreen = props => {
           console.log(data.detail);
         } else {
           console.log(data);
-          const jwt = data.access_token;
-          await storeUserData(jwt);
-          props.navigation.navigate('Home');
+          setUserRooms(data.rooms)
         }
       });
   }
@@ -46,8 +52,7 @@ const HomeScreen = props => {
   return (
     <SafeAreaView style={styles.container}>
       <Text>
-        {accessToken}
-        1234
+      {userRooms}
       </Text>
     </SafeAreaView>
   );
@@ -55,8 +60,10 @@ const HomeScreen = props => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#94B5E1',
-    alignItems: 'center'
+    backgroundColor: dark,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
   },
 });
 

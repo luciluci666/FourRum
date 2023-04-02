@@ -20,6 +20,8 @@ services:
 
   backend:
     container_name: backend
+    depends_on: 
+      - mysql
     build:
       context: "./backend"
     restart: "no"
