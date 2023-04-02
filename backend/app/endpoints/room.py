@@ -3,9 +3,7 @@ from datetime import datetime
 
 from app.database import Room, User__Room
 from app.schemas import CreateRoomForm, EditRoomForm, IdRoomForm
-
 from app.utils.exceptions import SuccessefulResponse
-
 from app.utils.general import get_session, object_to_json, delete_object
 from app.utils.auth_helpers import get_user_by_jwt
 from app.utils.room_helpers import check_manage_room_data_correct, get_room_by_id, edit_room, check_room_can_be_closed, check_if_user_created_room, get_not_deleted_user_rooms
@@ -17,7 +15,6 @@ class RoomRequests:
         self.engine = engine
         self.debug = debug
         
-
     async def user_get_room_info(self, room_id: int = Header(title="Room-Id"), token: str = Header(title="Authorization")):
         if self.debug:
             print(room_id)

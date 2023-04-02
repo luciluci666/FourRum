@@ -1,11 +1,11 @@
 from fastapi import APIRouter
 
-from app.endpoints.internal_requests import InternalRequests
-from app.endpoints.auth_requests import AuthRequests
-from app.endpoints.account_requests import AccountRequests
-from app.endpoints.room_requests import RoomRequests
+from app.endpoints import InternalRequests
+from app.endpoints import AuthRequests
+from app.endpoints import AccountRequests
+from app.endpoints import RoomRequests
 
-from app.schemas import UserResponse, RoomResponse, User__RoomResponse
+from app.schemas import UserResponse, RoomResponse
 from app.schemas import UsersResponse, RoomsResponse, User__RoomsResponse
 from app.schemas import Token, BasicResponse, RegResponse
 
