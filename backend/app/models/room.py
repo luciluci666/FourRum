@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 
-from . import BASE
+from .database import BASE
 
 
 class Room(BASE):

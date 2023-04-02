@@ -1,7 +1,7 @@
 from fastapi import Header
 from datetime import datetime
 
-from app.database import Room, User__Room
+from app.models import Room, User__Room
 from app.schemas import CreateRoomForm, EditRoomForm, IdRoomForm
 from app.utils.exceptions import SuccessefulResponse
 from app.utils.general import get_session, object_to_json, delete_object

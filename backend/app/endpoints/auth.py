@@ -1,7 +1,7 @@
 from datetime import datetime
 from fastapi import Request
 
-from app.database import User
+from app.models import User
 from app.schemas import RegForm, LogInForm
 from app.utils.general import get_session
 from app.utils.auth_helpers import authenticate_user, create_access_token, get_password_hash, check_reg_data_correct, verify_email

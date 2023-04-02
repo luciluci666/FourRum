@@ -1,4 +1,4 @@
-from app.database import User, Room, User__Room
+from app.models import User, Room, User__Room
 from app.utils.exceptions import SuccessefulResponse
 from app.utils.general import get_session, object_to_json
 

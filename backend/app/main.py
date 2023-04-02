@@ -1,12 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from time import sleep
 
 from config import MAIN_DB_URL
 from app.routes import Routes
-from app.database import Database
+from app.models import Database
 
-sleep(2)
 
 DEBUG = True
 DB_CONFIG = {
