@@ -39,4 +39,4 @@ class AuthRequests:
         session.commit()
         
         session.close()
-        return {"access_token": user.jwt, "token_type": "bearer"}
+        return {"access_token": access_token, "token_type": "bearer"}

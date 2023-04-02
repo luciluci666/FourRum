@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { StyleSheet, SafeAreaView, Keyboard, Button } from 'react-native';
+import { StyleSheet, SafeAreaView, View, Text, Keyboard, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import CustomInput from '../components/CustomInput'
 import url from '../Globals'
+import { white, light, dark, black, red } from '../Globals'
 
 const LoginScreen = props => {
   const [username, setUsername] = useState('StolenAmigo');
@@ -16,12 +17,12 @@ const LoginScreen = props => {
 
   const validateUsername = () => {
     if (!username) {
-      handleError('Please input username', 'username');
+      handleError('Please enter username', 'username');
     }
   };
   const validatePassword = () => {
     if (!password) {
-      handleError('Please input password', 'password');
+      handleError('Please enter password', 'password');
     } else if (password.length < 8) {
       handleError('Password must be at least 8 characters long', 'password');
     }
@@ -32,12 +33,12 @@ const LoginScreen = props => {
     let isValid = true;
 
     if (!username) {
-      handleError('Please input username', 'username');
+      handleError('Please enter username', 'username');
       isValid = false
     }
 
     if (!password) {
-      handleError('Please input password', 'password');
+      handleError('Please enter password', 'password');
       isValid = false
     } else if (password.length < 8) {
       handleError('Password must be at least 8 characters long', 'password');
@@ -56,7 +57,7 @@ const LoginScreen = props => {
       "password": password,
     };
 
-    const response = await fetch(url + '/user/login/', {
+    const response = await fetch(url + '/login', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -85,37 +86,63 @@ const LoginScreen = props => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <CustomInput
-      value={username}
-      setValue={setUsername}
-      placeholder="Enter your future username"
-      error={errors.username}
-      errorHandler={() => handleError(null, 'username')}
-      validate={validateUsername} />
-      <CustomInput
-      value={password}
-      setValue={setPassword}
-      placeholder="Enter password"
-      error={errors.password}
-      errorHandler={() => handleError(null, 'password')}
-      validate={validatePassword}
-      secureTextEntry />
-      <Button 
-      title="Submit" 
-      onPress = {validate}/>
-      <Button 
-      title="Register" 
-      onPress = {() => props.navigation.navigate('Registration')}/>
+    <SafeAreaView style={styles.background}>
+      <View style={styles.container}>
+        <View style={styles.logo}>
+          <Text style={styles.text}> FourRoom </Text>
+        </View>
+        <CustomInput
+        value={username}
+        setValue={setUsername}
+        placeholder="Enter your future username"
+        error={errors.username}
+        errorHandler={() => handleError(null, 'username')}
+        validate={validateUsername} />
+        <CustomInput
+        value={password}
+        setValue={setPassword}
+        placeholder="Enter password"
+        error={errors.password}
+        errorHandler={() => handleError(null, 'password')}
+        validate={validatePassword}
+        secureTextEntry />
+        <Button 
+        title="Submit" 
+        onPress = {validate}/>
+        <Button 
+        title="Register" 
+        onPress = {() => props.navigation.navigate('Registration')}/>
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  background: {
+    backgroundColor: dark,
+    flex: 1,
+  },
   container: {
-    backgroundColor: '#94B5E1',
-    alignItems: 'center'
+    maxWidth: 600,
+    minWidth: '35%',
+    alignItems: 'center',
+    alignSelf: 'center',
+    justifyContent: 'center',
+    flex: 1,
+
+    borderColor: light,
+    borderLeftWidth: 2,
+    borderRightWidth: 2
+  },
+  logo: {
+    alignSelf: 'center',
+    marginBottom: '25%',
+  },
+  text: {
+    fontFamily: 'Montserrat-SemiBold',
+    fontSize: 60,
+    backgroundColor: dark,
+    color: white,
   },
 });
-
 export default LoginScreen;

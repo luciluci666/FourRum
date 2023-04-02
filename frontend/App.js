@@ -1,37 +1,17 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import { useFonts } from 'expo-font';
+import React from 'react';
+import { StyleSheet } from 'react-native';
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-// import * as SplashScreen from 'expo-splash-screen';
 
 import RegistrationScreen from './source/screens/RegistrationScreen'
 import SplashScreen from './source/screens/SplashScreen';
 import LoginScreen from './source/screens/LoginScreen';
 import HomeScreen from './source/screens/HomeScreen';
 
-// SplashScreen.preventAutoHideAsync();
+
 const Stack = createStackNavigator();
 
 export default function App() {
-  // const [fontsLoaded] = useFonts({
-  //   'Montserrat-Light': require('./assets/fonts/Montserrat-Light.ttf'),
-  //   'Montserrat-LightItalic': require('./assets/fonts/Montserrat-LightItalic.ttf'),
-  //   'Montserrat-SemiBold': require('./assets/fonts/Montserrat-SemiBold.ttf'),
-  //   'Montserrat-SemiBoldItalic': require('./assets/fonts/Montserrat-SemiBoldItalic.ttf'),
-  // });
-
-  // const onLayoutRootView = useCallback(async () => {
-  //   if (fontsLoaded) {
-  //     await SplashScreen.hideAsync();
-  //   }
-  // }, [fontsLoaded]);
-
-  // if (!fontsLoaded) {
-  //   return null;
-  // }
-
   return (
     <NavigationContainer>
       <Stack.Navigator>

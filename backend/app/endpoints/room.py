@@ -114,9 +114,9 @@ class RoomRequests:
         check_user_can_enter_room(session, user.id, room.id)
         session.add(User__Room(user.id, room.id, userJoinedAt=datetime.utcnow()))
         session.commit()
+        room = object_to_json(room)
 
         session.close()
-        room = object_to_json(room)
         return {"room": room}
     
     async def user_leave_room(self, data: IdRoomForm, token: str = Header(title="Authorization")): # TODO: when last admin leaves the admin rights are passed to the other person 
